@@ -14,6 +14,8 @@ namespace T3docs\Examples\Controller;
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Core\Resource\Collection\AbstractFileCollection;
+use TYPO3\CMS\Core\Resource\FileCollectionRepository;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 /**
@@ -27,14 +29,11 @@ class CollectionController extends ActionController
 {
 
     /**
-     * @var \TYPO3\CMS\Core\Collection\RecordCollectionRepository
+     * @var FileCollectionRepository
      */
     protected $collectionRepository;
 
-    /**
-     * @param \TYPO3\CMS\Core\Collection\RecordCollectionRepository
-     */
-    public function __construct(\TYPO3\CMS\Core\Collection\RecordCollectionRepository $collectionRepository) {
+    public function __construct(FileCollectionRepository $collectionRepository) {
         $this->collectionRepository = $collectionRepository;
     }
 
@@ -46,11 +45,10 @@ class CollectionController extends ActionController
     public function indexAction()
     {
         // Get all existing collections
-        /** @var \TYPO3\CMS\Core\Collection\AbstractRecordCollection $collections */
+        /** @var AbstractFileCollection[] $collections */
         $collections = $this->collectionRepository->findAll();
 
         // Load the records in each collection
-        /** @var \TYPO3\CMS\Core\Collection\StaticRecordCollection $aCollection */
         foreach ($collections as $aCollection) {
             $aCollection->loadContents();
         }

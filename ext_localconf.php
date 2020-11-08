@@ -1,4 +1,5 @@
 <?php
+
 defined('TYPO3_MODE') or die();
 
 // Load XCLASSing of db_new
@@ -47,10 +48,10 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['T3docs']['Examples']['Controller']['processo
     'T3docs.Examples',
     'Error',
     [
-        'Error' => 'index',
+        \T3docs\Examples\Controller\ErrorController::class => 'index',
     ],
     [
-        'Error' => 'index',
+        \T3docs\Examples\Controller\ErrorController::class => 'index',
     ]
 );
 // Add TSconfig for new content element wizard
@@ -61,7 +62,7 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['T3docs']['Examples']['Controller']['processo
     'T3docs.Examples',
     'HtmlParser',
     [
-        'HtmlParser' => 'index',
+        \T3docs\Examples\Controller\HtmlParserController::class => 'index',
     ]
 );
 
@@ -70,9 +71,10 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['T3docs']['Examples']['Controller']['processo
     'T3docs.Examples',
     'Collections',
     [
-        'Collection' => 'index',
-    ],    [
-        'Collection' => 'index',
+        \T3docs\Examples\Controller\CollectionController::class => 'index',
+    ],
+    [
+        \T3docs\Examples\Controller\CollectionController::class => 'index',
     ]
 );
 
@@ -81,11 +83,11 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['T3docs']['Examples']['Controller']['processo
     'T3docs.Examples',
     'FalExamples',
     [
-        'FalExample' => 'index,listFiles,collection',
+        \T3docs\Examples\Controller\FalExampleController::class => 'index,listFiles,collection',
     ],
     // non-cacheable actions
     [
-        'FalExample' => 'index,listFiles,collection',
+        \T3docs\Examples\Controller\FalExampleController::class => 'index,listFiles,collection',
     ]
 );
 
