@@ -241,7 +241,6 @@ class ModuleController extends ActionController implements LoggerAwareInterface
             $depth,
             ''
         );
-        GeneralUtility::devLog('page tree', 'examples', 0, $tree->tree);
 
         // Pass the tree to the view
         $this->view->assign(
@@ -432,10 +431,11 @@ class ModuleController extends ActionController implements LoggerAwareInterface
     public function countAction(ServerRequestInterface $request, ResponseInterface $response)
     {
         $requestParameters = $request->getQueryParams();
-        $count = $this->getDatabaseConnection()->exec_SELECTcountRows(
-            'uid',
-            addslashes($requestParameters['table'])
-        );
+        $tablename = addslashes($requestParameters['table']);
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable($tablename);
+        $count = $connection->count('uid', $tablename, []);
 
         // Send the response
         $response->getBody()->write(json_encode($count));
