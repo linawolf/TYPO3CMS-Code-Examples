@@ -24,11 +24,11 @@ use TYPO3\CMS\Backend\Template\Components\Menu\MenuItem;
 use TYPO3\CMS\Backend\Tree\View\PageTreeView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Log\LogLevel;
-use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -37,6 +37,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
  * Controller for the backend module
@@ -54,13 +55,19 @@ class ModuleController extends ActionController implements LoggerAwareInterface
     protected $view;
 
     /**
+     * Backend Template Container
+     *
+     * @var string
+     */
+    protected $defaultViewObjectName = \TYPO3\CMS\Backend\View\BackendTemplateView::class;
+
+    /**
      * Initializes the template to use for all actions.
      *
      * @return void
      */
     protected function initializeAction()
     {
-        $this->defaultViewObjectName = BackendTemplateView::class;
     }
 
     /**
@@ -72,10 +79,13 @@ class ModuleController extends ActionController implements LoggerAwareInterface
      */
     protected function initializeView(ViewInterface $view)
     {
-        if ($view instanceof BackendTemplateView) {
-            parent::initializeView($view);
-        }
-        $pageRenderer = $view->getModuleTemplate()->getPageRenderer();
+        parent::initializeView($view);
+
+
+        /**
+         * @var \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer
+         */
+        $pageRenderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Examples/Application');
         // Make localized labels available in JavaScript context
         $pageRenderer->addInlineLanguageLabelFile('EXT:examples/Resources/Private/Language/locallang.xlf');
@@ -111,7 +121,8 @@ class ModuleController extends ActionController implements LoggerAwareInterface
             $menu->addMenuItem($menuItem);
         }
 
-        $this->view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
+
+        $view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
     }
 
     /**
@@ -297,13 +308,16 @@ class ModuleController extends ActionController implements LoggerAwareInterface
         $fileRepository = $this->objectManager->get(FileRepository::class);
         // Get all non-deleted content elements (this should normally be put away in a nice, clean
         // repository class; don't do this at home).
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tt_content');
         try {
-            $contentElements = $this->getDatabaseConnection()->exec_SELECTgetRows(
-                'uid, header',
+            $contentElements = $connection->select(
+                ['uid', 'header'],
                 'tt_content',
-                '1 = 1' . BackendUtility::deleteClause('tt_content'),
-                '',
-                'header ASC'
+                [] ,
+                [],
+                ['header' => 'ASC']
             );
         } catch (\Exception $e) {
             $contentElements = [];
@@ -426,15 +440,5 @@ class ModuleController extends ActionController implements LoggerAwareInterface
         // Send the response
         $response->getBody()->write(json_encode($count));
         return $response;
-    }
-
-    /**
-     * Returns the global database connection object.
-     *
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 }
