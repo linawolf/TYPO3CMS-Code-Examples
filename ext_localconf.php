@@ -71,7 +71,7 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['T3docs']['Examples']['Controller']['processo
     ]
 );
 // Add TSconfig for new content element wizard
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('<INCLUDE_TYPOSCRIPT: source="FILE:EXT:examples/Configuration/TSconfig/Page/ContentElementWizard.txt">');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('@import \'EXT:examples/Configuration/TSconfig/Page/\'');
 
 // Register the HTML parser plugin
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
@@ -112,12 +112,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']['de']['EXT:cms/locall
 
 // Register custom RTE transformation
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_parsehtml_proc.php']['transformation']['tx_examples_transformation'] = \T3docs\Examples\Service\RteTransformation::class;
-// Add necessary TSconfig to active custom RTE transformation
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
-    '
-            RTE.default.proc.usertrans.tx_examples_transformation.addHrulerInRTE = 1
-	        RTE.config.tx_examples_haiku.poem.proc.overruleMode = tx_examples_transformation,ts_css
-    '
-);
+// the necessary configuration can be found examples/Configuration/TSconfig/Page/Rte.tsconfig
 
 $GLOBALS['TYPO3_CONF_VARS']['BE']['ContextMenu']['ItemProviders'][1488274371] = \T3docs\Examples\ContextMenu\HelloWorldItemProvider::class;

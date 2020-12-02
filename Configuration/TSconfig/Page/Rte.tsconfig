@@ -1,0 +1,3 @@
+
+RTE.default.proc.usertrans.tx_examples_transformation.addHrulerInRTE = 1
+RTE.config.tx_examples_haiku.poem.proc.overruleMode = tx_examples_transformation,ts_css
