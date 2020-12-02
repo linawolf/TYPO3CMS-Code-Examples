@@ -28,7 +28,7 @@ class RteTransformation
      *
      * @var \TYPO3\CMS\Core\Html\RteHtmlParser
      */
-    public $htmlParser;
+    public $pObj;
 
     /**
      * NOTE: must be public as it is accessed by \TYPO3\CMS\Core\Html\RteHtmlParser without API
@@ -47,9 +47,9 @@ class RteTransformation
      *
      * @return void
      */
-    protected function loadConfiguration()
+    protected function loadConfiguration($htmlParser)
     {
-        $this->configuration = $this->htmlParser->procOptions['usertrans.'][$this->transformationKey . '.'];
+        $this->configuration = $htmlParser->procOptions['usertrans.'][$this->transformationKey . '.'];
     }
 
     /**
@@ -58,10 +58,9 @@ class RteTransformation
      * @param string $value RTE HTML to clean for database storage
      * @return string
      */
-    public function transform_db($value)
+    public function transform_db($value, \TYPO3\CMS\Core\Html\RteHtmlParser $htmlParser)
     {
-        $this->loadConfiguration();
-
+        $this->loadConfiguration($htmlParser);
         // Remove the "artificially" added ruler before saving to the database
         if ($this->configuration['addHrulerInRTE']) {
             $value = preg_replace('/<hr[[:space:]]*[\/]>[[:space:]]*$/i', '', $value);
@@ -76,9 +75,9 @@ class RteTransformation
      * @param string $value Database content to transform into RTE-ready HTML
      * @return string
      */
-    public function transform_rte($value)
+    public function transform_rte($value, \TYPO3\CMS\Core\Html\RteHtmlParser $htmlParser)
     {
-        $this->loadConfiguration();
+        $this->loadConfiguration($htmlParser);
 
         // Adds a ruler at the bottom of the RTE content
         if ($this->configuration['addHrulerInRTE']) {
